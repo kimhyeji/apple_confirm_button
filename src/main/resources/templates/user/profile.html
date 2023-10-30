@@ -15,6 +15,7 @@
     <div>
         <img th:src="@{|${siteUser.filepath}|}" alt="User Image" style="max-width: 300px; max-height: 300px;">
     </div>
+    <div th:text="'닉넴 : ' + ${siteUser.nickname}"></div>
     <div th:text="'나이 : ' + ${siteUser.age}"></div>
     <div th:text="'지역 : ' + ${siteUser.living}"></div>
     <div th:text="'취미 : ' + ${siteUser.hobby}"></div>
@@ -44,11 +45,14 @@
 
     <div>
         <a class="btn btn-primary interest-button"
-           th:if="${isInterested}"
-           th:href="@{'/user/add_interest/' + ${siteUser.id}}">관심 해제</a>
-        <a class="btn btn-primary interest-button"
-           th:unless="${isInterested}"
+           th:if="${isInterested == false}"
            th:href="@{'/user/add_interest/' + ${siteUser.id}}">관심 등록하기</a>
+        <a class="btn btn-primary interest-button"
+           th:if="${isInterested == null}"
+           th:href="@{'/user/add_interest/' + ${siteUser.id}}">null</a>
+        <a class="btn btn-primary interest-button"
+           th:if="${isInterested == true}"
+        th:href="@{'/user/add_interest/' + ${siteUser.id}}">관심 해제</a>
     </div>
 
 

@@ -262,13 +262,13 @@ public class UserController {
     }
 
     //조회하기
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/detail/{id}")
-    public String paymentPage(Model model, @PathVariable("id") Integer id) {
-        SiteUser siteUser = this.userService.getUser(id);
-        model.addAttribute("siteUser", siteUser);
-        return "user/profile";
-    }
+//    @PreAuthorize("isAuthenticated()")
+//    @GetMapping("/detail/{id}")
+//    public String paymentPage(Model model, @PathVariable("id") Integer id) {
+//        SiteUser siteUser = this.userService.getUser(id);
+//        model.addAttribute("siteUser", siteUser);
+//        return "user/profile";
+//    }
 
     //신고하기
     @PreAuthorize("isAuthenticated()")
@@ -334,10 +334,23 @@ public class UserController {
         return "redirect:/user/myPage";
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/detail/{id}")
+    public String paymentPage(Principal principal, Model model, @PathVariable("id") Integer id, HttpSession session) {
+        SiteUser siteUser = this.userService.getUser(id);
+        model.addAttribute("siteUser", siteUser);
+
+        String currentUser = principal.getName();
+        boolean isInterested = interestService.isInterested(id, currentUser);
+        model.addAttribute("isInterested", isInterested);
+
+        return "user/profile";
+    }
+
     //관심 추가하기
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/add_interest/{id}")
-    public String toggleInterest(Principal principal, @PathVariable Integer id, Model model) {
+    public String toggleInterest(Principal principal, @PathVariable Integer id, Model model, HttpSession session) {
         String interest_user = principal.getName();
         model.addAttribute("userId", id);
 
@@ -345,14 +358,11 @@ public class UserController {
         boolean isInterested = interestService.isInterested(id, interest_user);
 
         if (isInterested) {
-            // If already interested, remove from the interest list
             interestService.removeInterest(id, interest_user);
-            model.addAttribute("isInterested", false);
-
+            session.setAttribute("isInterested", false);
         } else {
-            // If not interested, add to the interest list
             interestService.addInterest(id, interest_user);
-            model.addAttribute("isInterested", true);
+            session.setAttribute("isInterested", true);
         }
 
         return "redirect:/user/detail/{id}";
